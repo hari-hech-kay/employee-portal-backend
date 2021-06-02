@@ -4,6 +4,7 @@ import com.example.demo.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +28,13 @@ public class EmployeeController {
 	private EmployeeRepository employeeRepository;
 	
 	@GetMapping("/employees")
+	@PreAuthorize("hasRole('EMPLOYEE') or hasRole('ADMIN')")
 	public List<Employee> getAllEmployees(){
 		return employeeRepository.findAll();
 	}
 	
 	@GetMapping("/employees/{id}")
+	@PreAuthorize("hasRole('EMPLOYEE')  or hasRole('ADMIN')")
 	public ResponseEntity<Employee> getEmployeeById(@PathVariable(value = "id") Long employeeId)
 		throws ResourceNotFoundException {
 			Employee employee = employeeRepository.findById(employeeId).orElseThrow(()-> new ResourceNotFoundException("Employee not found for this id: " + employeeId));
@@ -39,11 +42,13 @@ public class EmployeeController {
 			}
 	
 	@PostMapping("/employees")
+	@PreAuthorize("hasRole('ADMIN')")
 	public Employee createEmployee(@RequestBody Employee employee) {
 		return employeeRepository.save(employee);
 	}
 	
 	@PutMapping("/employees/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Employee> updateEmployee(@PathVariable(value = "id") Long employeeId,  @Validated @RequestBody Employee employeeDetails) throws ResourceNotFoundException {
 		Employee employee = employeeRepository.findById(employeeId).orElseThrow(()-> new ResourceNotFoundException("Employee not found for this id: " + employeeId));
 		
@@ -60,6 +65,7 @@ public class EmployeeController {
 	}
 	
 	 @DeleteMapping("/employees/{id}")
+	 @PreAuthorize("hasRole('ADMIN')")
 	    public Map<String, Boolean> deleteEmployee(@PathVariable(value = "id") Long employeeId)
 	         throws ResourceNotFoundException {
 	        Employee employee = employeeRepository.findById(employeeId)
