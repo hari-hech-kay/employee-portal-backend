@@ -41,7 +41,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
-		super.configure(auth);
+		
 	}
 
 	@Override
@@ -53,12 +53,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeRequests()
-			.antMatchers("/auth/login","/auth/register").permitAll()
+			.antMatchers("/auth/**").permitAll()
 			.anyRequest()
 			.authenticated();
 		
 		http.addFilterBefore(jwAuthTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-		super.configure(http);
+		
 	}
 	
 	

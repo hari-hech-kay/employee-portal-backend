@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,8 @@ import io.jsonwebtoken.*;
 public class JWTUtils {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(JWTUtils.class);
+	
+	@Value("${jwtSecret}")
 	private String jwtSecret;
 	private int jwtExpiration = 3;
 	private Calendar calendar = Calendar.getInstance();

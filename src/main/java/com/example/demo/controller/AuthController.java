@@ -56,16 +56,17 @@ public class AuthController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
-		Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		System.out.println("inside login");
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		System.out.println("after auth");
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 		
-		SecurityContextHolder.getContext().setAuthentication(auth);
-		
-		AppUserDetails appUserDetails = (AppUserDetails) auth.getPrincipal();
+		AppUserDetails appUserDetails = (AppUserDetails) authentication.getPrincipal();
 		List<String> roles = appUserDetails.getAuthorities()
 				.stream()
 				.map(role -> role.getAuthority())
 				.collect(Collectors.toList());
-		String jwtToken = jwtUtils.generateJwtToken(auth);
+		String jwtToken = jwtUtils.generateJwtToken(authentication);
 		
 		return ResponseEntity.ok(
 				new JWTResponse(
@@ -87,6 +88,10 @@ public class AuthController {
 					.badRequest()
 					.body(new MessageResponse("User with this email already exists!"));
 		}
+//		if(!roleRepository.existsByName(RoleEnum.ADMIN))
+//			roleRepository.save(new Role(RoleEnum.ADMIN));
+//		if(!roleRepository.existsByName(RoleEnum.EMPLOYEE))
+//			roleRepository.save(new Role(RoleEnum.EMPLOYEE));
 		
 		Employee newEmployee = new Employee(
 				registerRequest.getUsername(),
@@ -103,12 +108,12 @@ public class AuthController {
 		rolesString.forEach(role -> {
 			switch (role) {
 			case "admin":
-			Role adminRole = roleRepository.findByName(RoleEnum.ADMIN).orElseThrow(()-> new RuntimeException("Error: Role" + role + "is not found")); 
+			Role adminRole = roleRepository.findByName(RoleEnum.ADMIN).orElseThrow(()-> new RuntimeException("Error: Role " + role + " is not found in database")); 
 				roles.add(adminRole);
 				break;
 
 			default:
-				Role employeeRole = roleRepository.findByName(RoleEnum.EMPLOYEE).orElseThrow(() -> new RuntimeException("Error: Role" + role + "is not found")); 
+				Role employeeRole = roleRepository.findByName(RoleEnum.EMPLOYEE).orElseThrow(() -> new RuntimeException("Error: Role " + role + " is not found")); 
 				roles.add(employeeRole);
 				break;
 			}
