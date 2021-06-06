@@ -3,6 +3,7 @@ package com.example.demo.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -29,7 +31,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	public PasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder(10);
+		return new BCryptPasswordEncoder();
 	}
 	
 	@Bean
@@ -50,6 +52,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 			.cors()
 			.and()
 			.csrf().disable()
+			.exceptionHandling().authenticationEntryPoint( new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+			.and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeRequests()

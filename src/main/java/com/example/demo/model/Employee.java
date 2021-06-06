@@ -58,20 +58,32 @@ public class Employee {
 	
 	public Employee() {}
 
-	
+//	public Employee(String username, String password, String firstName, String lastName,
+//			float salary, String email, String department, String designation) {
+//		super();
+//		this.username = username;
+//		this.password = password;
+//		this.roles = roles;
+//		this.firstName = firstName;
+//		this.lastName = lastName;
+//		this.salary = salary;
+//		this.email = email;
+//		this.department = department;
+//		this.designation = designation;
+//	}
 
-	public Employee(String username, String password, String firstName, String lastName,
-			float salary, String email, String department, String designation) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.salary = salary;
-		this.email = email;
-		this.department = department;
-		this.designation = designation;
-	}
+//	public Employee(String username, String password,  String firstName, String lastName,
+//			float salary, String email, String department, String designation) {
+//		super();
+//		this.username = username;
+//		this.password = password;
+//		this.firstName = firstName;
+//		this.lastName = lastName;
+//		this.salary = salary;
+//		this.email = email;
+//		this.department = department;
+//		this.designation = designation;
+//	}
 
 
 

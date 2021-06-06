@@ -1,9 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -20,16 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.model.Employee;
 import com.example.demo.model.Role;
 import com.example.demo.model.RoleEnum;
-import com.example.demo.model.Employee;
 import com.example.demo.payload.request.LoginRequest;
 import com.example.demo.payload.request.RegisterRequest;
-import com.example.demo.payload.response.JWTResponse;
-import com.example.demo.payload.response.MessageResponse;
-import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.EmployeeRepository;
-import com.example.demo.security.AppUserDetails;
+import com.example.demo.repository.RoleRepository;
 import com.example.demo.security.JWTUtils;
 
 @RestController
@@ -38,7 +33,7 @@ import com.example.demo.security.JWTUtils;
 public class AuthController {
 
 	AuthenticationManager authenticationManager;
-	EmployeeRepository userRepository;
+	EmployeeRepository employeeRepository;
 	RoleRepository roleRepository;
 	PasswordEncoder passwordEncoder;
 	JWTUtils jwtUtils;
@@ -48,7 +43,7 @@ public class AuthController {
 			RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTUtils jwtUtils) {
 		super();
 		this.authenticationManager = authenticationManager;
-		this.userRepository = employeeRepository;
+		this.employeeRepository = employeeRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtUtils = jwtUtils;
@@ -61,65 +56,46 @@ public class AuthController {
 		System.out.println("after auth");
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		
-		AppUserDetails appUserDetails = (AppUserDetails) authentication.getPrincipal();
-		List<String> roles = appUserDetails.getAuthorities()
-				.stream()
-				.map(role -> role.getAuthority())
-				.collect(Collectors.toList());
 		String jwtToken = jwtUtils.generateJwtToken(authentication);
 		
-		return ResponseEntity.ok(
-				new JWTResponse(
-						jwtToken,
-						appUserDetails.getUsername(),
-						appUserDetails.getPassword(),
-						roles));
+		return ResponseEntity.ok(jwtToken);
 	}
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest){
-		if(userRepository.existsByUsername(registerRequest.getUsername())) {
+		if(employeeRepository.existsByUsername(registerRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Username is already taken!"));
+					.body("Username is already taken!");
 		}
-		if(userRepository.existsByEmail(registerRequest.getUsername())) {
+		if(employeeRepository.existsByEmail(registerRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("User with this email already exists!"));
+					.body("User with this email already exists!");
 		}
-//		if(!roleRepository.existsByName(RoleEnum.ADMIN))
-//			roleRepository.save(new Role(RoleEnum.ADMIN));
-//		if(!roleRepository.existsByName(RoleEnum.EMPLOYEE))
-//			roleRepository.save(new Role(RoleEnum.EMPLOYEE));
-		
-		Employee newEmployee = new Employee(
-				registerRequest.getUsername(),
-				passwordEncoder.encode(registerRequest.getPassword()),
-				registerRequest.getFirstName(),
-				registerRequest.getLastName(),
-				registerRequest.getSalary(),
-				registerRequest.getEmail(),
-				registerRequest.getDepartment(),
-				registerRequest.getDesignation());
-		
-		Set<String> rolesString = registerRequest.getRoles();
-		Set<Role> roles = new HashSet<>();
-		rolesString.forEach(role -> {
-			switch (role) {
-			case "admin":
-			Role adminRole = roleRepository.findByName(RoleEnum.ADMIN).orElseThrow(()-> new RuntimeException("Error: Role " + role + " is not found in database")); 
-				roles.add(adminRole);
-				break;
 
-			default:
-				Role employeeRole = roleRepository.findByName(RoleEnum.EMPLOYEE).orElseThrow(() -> new RuntimeException("Error: Role " + role + " is not found")); 
-				roles.add(employeeRole);
+		
+		Employee newEmployee = new Employee();
+		newEmployee.setUsername(registerRequest.getUsername());
+		newEmployee.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+		newEmployee.setFirstName(registerRequest.getFirstName());
+		newEmployee.setLastName(registerRequest.getLastName());
+		newEmployee.setSalary(registerRequest.getSalary());
+		newEmployee.setEmail(registerRequest.getEmail());
+		newEmployee.setDepartment(registerRequest.getDepartment());
+		newEmployee.setDesignation(registerRequest.getDesignation());
+		
+		String roleString = registerRequest.getRole();
+		Set<Role> roles = new HashSet<>();
+			switch (roleString) {
+			case "ADMIN":
+				roles.add(new Role(RoleEnum.ADMIN));
+			default: 
+				roles.add(new Role(RoleEnum.EMPLOYEE));
 				break;
 			}
-		});
 		newEmployee.setRoles(roles);
-		userRepository.save(newEmployee);
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		employeeRepository.save(newEmployee);
+		return ResponseEntity.ok("User registered successfully!");
 	}
 }

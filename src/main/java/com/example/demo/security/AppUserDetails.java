@@ -18,12 +18,14 @@ public class AppUserDetails implements UserDetails {
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private long id;
 	private String username;
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public AppUserDetails(String username,String password,
+	public AppUserDetails(long id, String username,String password,
 			Collection<? extends GrantedAuthority> authorities) {
+		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.authorities = authorities;
@@ -31,10 +33,11 @@ public class AppUserDetails implements UserDetails {
 	
 	public static AppUserDetails build(Employee employee) {
 		List<SimpleGrantedAuthority> authorities = employee.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName().name()))
+				.map(role -> new SimpleGrantedAuthority("ROLE_"+role.getName().name()))
 				.collect(Collectors.toList());
 		
 		return new AppUserDetails(
+				employee.getId(),
 				employee.getUsername(),
 				employee.getPassword(),
 				authorities);
@@ -45,17 +48,21 @@ public class AppUserDetails implements UserDetails {
 		// TODO Auto-generated method stub
 		return authorities;
 	}
-
-	@Override
-	public String getPassword() {
-		// TODO Auto-generated method stub
-		return password;
+	
+	public long getId() {
+		return id;
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return username;
+	}
+
+	@Override
+	public String getPassword() {
+		// TODO Auto-generated method stub
+		return password;
 	}
 
 	@Override
@@ -82,6 +89,10 @@ public class AppUserDetails implements UserDetails {
 		return true;
 	}
 
+	public void setId(long id) {
+		this.id = id;
+	}
+	
 	public void setUsername(String username) {
 		this.username = username;
 	}

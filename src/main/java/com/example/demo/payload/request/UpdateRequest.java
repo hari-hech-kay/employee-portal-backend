@@ -1,26 +1,21 @@
 package com.example.demo.payload.request;
 
-import java.util.Set;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
-public class RegisterRequest {
+public class UpdateRequest {
 
-	@NotBlank
-	@Size(min = 4, max=16)
-	private String username;
-	
-	@NotBlank
-	@Size(min = 6, max=32)
-	private String password;
 	
 	@NotBlank
 	@Email
 	private String email;
 	
-	private String roles;
+	@Override
+	public String toString() {
+		return "UpdateRequest [email=" + email + "firstName=" + firstName + ", lastName="
+				+ lastName + ", salary=" + salary + ", department=" + department + ", designation=" + designation + "]";
+	}
+	//private String roles;
 	
 	@NotBlank
 	private String firstName;
@@ -31,24 +26,13 @@ public class RegisterRequest {
 	private float salary;
 	private String department;
 	private String designation;
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public String getRole() {
-		return roles;
-	}
-	public void setRole(String role) {
-		this.roles = role;
-	}
+	
+//	public String getRole() {
+//		return roles;
+//	}
+//	public void setRole(String role) {
+//		this.roles = role;
+//	}
 	public String getEmail() {
 		return email;
 	}
@@ -86,6 +70,4 @@ public class RegisterRequest {
 	public void setDesignation(String designation) {
 		this.designation = designation;
 	}
-	
-
 }

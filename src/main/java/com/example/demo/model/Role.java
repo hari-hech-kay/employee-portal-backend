@@ -17,8 +17,9 @@ public class Role {
 	@Enumerated(value = EnumType.STRING)
 	private RoleEnum name;
 
+	public Role() {
+	}
 	public Role(RoleEnum name) {
-		super();
 		this.name = name;
 	}
 
